@@ -1,0 +1,93 @@
+.pr2-host { display: block; box-sizing: border-box; width: 100%; min-width: 0; max-width: 100%; margin: 0 !important; padding: 0 !important; border: 0 !important; background: var(--vscode-editor-background, #1e1e1e); color: var(--vscode-foreground, #cccccc); font: 13px/1.4 var(--vscode-font-family, system-ui); }
+/* VS Code/Jupyter may paint the output wrapper white, outside AnyWidget's el.
+   Restrict this reset to wrappers containing this editor, not other outputs. */
+:where(.output, .output_container, .output_subarea, .widget-subarea,
+       .jp-OutputArea-output, .jupyter-widgets, div:has(> .pr2-host)):has(.pr2-host) {
+  --jp-layout-color0: var(--vscode-editor-background, #1e1e1e);
+  --jp-layout-color1: var(--vscode-editor-background, #1e1e1e);
+  background: var(--vscode-editor-background, #1e1e1e) !important;
+  border: 0 !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+.pr2-host .pr2-card { border: 0 !important; border-radius: 0; box-shadow: none !important; background: var(--vscode-editor-background, #1e1e1e); overflow: hidden; width: 100%; }
+.pr2-host .pr2-title-row, .pr2-host .pr2-section-head, .pr2-host .pr2-toolbar, .pr2-host .pr2-global-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.pr2-host .pr2-title-row { justify-content: space-between; padding: 12px 14px; border-top: 0 !important; box-shadow: none !important; background: var(--vscode-sideBar-background, #252526); font-size: 14px; }
+.pr2-host .pr2-title-row code { color: var(--vscode-symbolIcon-functionForeground, #dcdcaa); font-size: 14px; }
+.pr2-host .pr2-chip { margin-left: 10px; padding: 2px 7px; border: 1px solid var(--vscode-panel-border, #555); border-radius: 4px; }
+.pr2-host .pr2-parameters { display: flex; gap: 10px; }
+.pr2-host .pr2-section { padding: 11px 14px 13px; border-top: 1px solid var(--vscode-panel-border, #343434); }
+.pr2-host .pr2-section-head { justify-content: space-between; margin-bottom: 8px; font-weight: 600; }
+.pr2-host .pr2-muted { color: var(--vscode-descriptionForeground, #999); font-weight: 400; }
+.pr2-host .pr2-status { color: var(--vscode-descriptionForeground, #999); font-size: 12px; font-weight: 400; min-height: 1em; }
+.pr2-host .pr2-grid { display: flex; flex-wrap: nowrap; gap: 0; overflow-x: auto; max-width: 100%; user-select: none; scrollbar-width: thin; scrollbar-color: var(--vscode-scrollbarSlider-background, #555) transparent; }
+.pr2-host .pr2-cell { box-sizing: border-box; flex: 0 0 48px; min-width: 48px; height: 32px; margin: 0; border: 0; border-radius: 0; box-shadow: inset -1px 0 rgb(0 0 0 / 15%); font: 600 12px var(--vscode-editor-font-family, monospace); cursor: pointer; }
+.pr2-host .pr2-x-cell { color: var(--vscode-button-foreground, white); background: var(--vscode-button-background, #0e639c); }
+.pr2-host .pr2-y-cell, .pr2-host .pr2-channel-cell { color: var(--vscode-foreground, #ddd); background: var(--vscode-input-background, #313131); cursor: default; }
+.pr2-host .pr2-codeword-scroll { max-width: 100%; overflow-x: auto; scrollbar-width: thin; scrollbar-color: var(--vscode-scrollbarSlider-background, #555) transparent; }
+.pr2-host .pr2-codeword-content { width: max-content; }
+.pr2-host .pr2-codeword-content .pr2-grid { overflow: visible; max-width: none; }
+.pr2-host .pr2-encoding-arrow { text-align: center; padding: 4px 0; color: var(--vscode-descriptionForeground, #999); font-size: 20px; line-height: 1; }
+.pr2-host .pr2-codeword-scroll:focus-visible { outline: 2px solid #75beff !important; outline-offset: -2px; }
+.pr2-host.pr2-pointer-focus .pr2-codeword-scroll:focus { outline: none !important; }
+.pr2-host .pr2-yprime-cell { touch-action: none; transition: background 70ms linear; }
+.pr2-host .pr2-toolbar { margin-bottom: 9px; }
+.pr2-host .pr2-global-row { justify-content: flex-end; flex-wrap: nowrap; gap: 0; margin-top: 9px; overflow-x: auto; }
+.pr2-host .pr2-reset-row { display: flex; justify-content: flex-end; margin-top: 9px; }
+.pr2-host .pr2-drag-hint { flex: 1 1 0; min-width: 0; overflow: hidden; white-space: nowrap; }
+.pr2-host .pr2-hint-text { display: inline-block; }
+.pr2-host .pr2-global-row > label, .pr2-host .pr2-global-row > button { flex: 0 0 auto; white-space: nowrap; margin-left: 12px; position: relative; z-index: 1; }
+.pr2-host .pr2-scrolling .pr2-hint-text { animation: pr2-hint-scroll var(--pr2-hint-duration) ease-in-out infinite alternate; }
+@keyframes pr2-hint-scroll { 0%, 15% { transform: translateX(0); } 85%, 100% { transform: translateX(var(--pr2-hint-shift)); } }
+@media (prefers-reduced-motion: reduce) { .pr2-host .pr2-scrolling { overflow-x: auto; } .pr2-host .pr2-scrolling .pr2-hint-text { animation: none; } }
+.pr2-host .pr2-segmented { display: inline-flex; }
+.pr2-host .pr2-segmented button { border-radius: 0; margin-left: -1px; }
+.pr2-host .pr2-segmented button:first-child { border-radius: 4px 0 0 4px; margin-left: 0; }
+.pr2-host .pr2-segmented button:last-child { border-radius: 0 4px 4px 0; }
+.pr2-host :where(button) { color: var(--vscode-button-foreground, white); background: var(--vscode-button-secondaryBackground, #3a3d41); border: 1px solid var(--vscode-button-border, transparent); border-radius: 4px; padding: 5px 9px; }
+.pr2-host :where(button:hover), .pr2-host .pr2-segmented button.active { background: var(--vscode-button-background, #0e639c); }
+.pr2-host input { width: 46px; box-sizing: border-box; color: var(--vscode-input-foreground, #ddd); background: var(--vscode-input-background, #313131); border: 1px solid var(--vscode-input-border, #555); border-radius: 4px; padding: 3px 5px; }
+.pr2-host label { white-space: nowrap; }
+
+.pr2-host [hidden] { display: none !important; }
+.pr2-host .pr2-erase { display: inline-flex; align-items: center; justify-content: center; padding: 3px 9px; white-space: nowrap; border: 1px solid var(--vscode-input-border, #555); background: var(--vscode-input-background, #313131); }
+.pr2-host .pr2-erase[aria-pressed="true"] { color: #fff; background: var(--vscode-button-background, #0e639c); border-color: #75beff; }
+.pr2-host .pr2-erase[aria-pressed="true"]:focus-visible { box-shadow: inset 0 0 0 2px #fff !important; }
+.pr2-host .pr2-suppress-param:has(input:disabled) { color: var(--vscode-disabledForeground, #888); }
+.pr2-host .pr2-number input:disabled { cursor: not-allowed; }
+.pr2-host .pr2-cell:disabled { opacity: 1; }
+/* Inset focus rings remain visible inside clipped rows and rounded controls. */
+.pr2-host button:focus-visible { outline: none !important; box-shadow: inset 0 0 0 2px #75beff !important; }
+.pr2-host .pr2-x-cell:focus-visible,
+.pr2-host .pr2-segmented button.active:focus-visible { box-shadow: inset 0 0 0 2px #fff !important; }
+.pr2-host .pr2-yprime-cell:focus-visible { box-shadow: inset 0 0 0 2px #171717 !important; }
+.pr2-host .pr2-grid:focus-visible { outline: 2px solid #75beff !important; outline-offset: -2px; }
+.pr2-host:focus { outline: none !important; }
+
+.pr2-host button:not(.pr2-cell), .pr2-host input { font: inherit; }
+.pr2-host .pr2-polynomial { background: var(--vscode-textCodeBlock-background, #383838); color: #c586c0; padding: 2px 3px; }
+.pr2-host .pr2-cell:first-child { border-radius: 4px 0 0 4px; }
+.pr2-host .pr2-cell:last-child { border-radius: 0 4px 4px 0; }
+.pr2-host .pr2-cell:only-child { border-radius: 4px; }
+
+.pr2-host .pr2-number { display: inline-flex; align-items: stretch; vertical-align: middle; border: 1px solid var(--vscode-input-border, #555); border-radius: 4px; overflow: hidden; background: var(--vscode-input-background, #313131); }
+.pr2-host .pr2-number input { width: 36px; min-width: 0; padding: 3px 2px; text-align: center; font-variant-numeric: tabular-nums; border: 0; border-radius: 0; appearance: textfield; -moz-appearance: textfield; }
+.pr2-host .pr2-number input:focus, .pr2-host .pr2-number input:focus-visible { outline: none !important; box-shadow: none !important; border: 0 !important; }
+.pr2-host .pr2-number input::-webkit-inner-spin-button, .pr2-host .pr2-number input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.pr2-host .pr2-number:focus-within { outline: 1px solid var(--vscode-focusBorder, #007acc); }
+.pr2-host .pr2-number-arrows { display: flex; flex-direction: column; width: 14px; flex: 0 0 14px; border-left: 1px solid var(--vscode-input-border, #555); }
+.pr2-host .pr2-number-arrows button { display: flex; align-items: center; justify-content: center; flex: 1; min-height: 0; padding: 0; margin: 0; border: 0; border-radius: 0; font: 10px/1 sans-serif; color: var(--vscode-foreground, #ccc); background: var(--vscode-button-secondaryBackground, #3a3d41); cursor: pointer; }
+.pr2-host .pr2-number-arrows button + button { border-top: 1px solid var(--vscode-input-border, #555); }
+.pr2-host .pr2-number-arrows button:hover { color: white; background: var(--vscode-button-background, #0e639c); }
+.pr2-host .pr2-number-arrows button:active { background: var(--vscode-button-hoverBackground, #1177bb); }
+.pr2-host .pr2-number-arrows button:focus-visible { color: #fff; background: #0e639c; outline: none !important; box-shadow: inset 0 0 0 1px #fff !important; }
+.pr2-host .pr2-number:has(input:disabled) { opacity: .5; }
+.pr2-host .pr2-number-arrows button:disabled { cursor: default; background: var(--vscode-input-background, #313131); }
+
+.pr2-host .pr2-number-label { position: relative; top: 2px; }
+
+.pr2-host button:focus:not(:focus-visible), .pr2-host .pr2-grid:focus:not(:focus-visible) { outline: none !important; }
+
+.pr2-host:focus, .pr2-host:focus-visible { outline: none !important; box-shadow: none !important; }
+.pr2-host.pr2-pointer-focus button:focus, .pr2-host.pr2-pointer-focus .pr2-grid:focus { outline: none !important; box-shadow: none !important; }

@@ -89,7 +89,7 @@ def _iterate(initial, terms, iterations, mode, alpha):
                         continue
                     sign = -1.0 if (negatives - (value < 0)) % 2 else 1.0
                     log_mean = (log_sum - prefix[target]) / (width - 1)
-                    updated[bit] += sign * np.exp(log_mean - np.log(2.0))
+                    updated[bit] += sign * np.exp(log_mean)
                 continue
             prefix[0] = np.inf
             # The full-check XOR is never used by any leave-one-out message.

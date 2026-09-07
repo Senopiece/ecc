@@ -124,7 +124,8 @@ class ComparisonView(widgets.GridBox):
             showlegend=False,
         )
         self.chart = go.FigureWidget(figure)
-        self.chart._config.update(PLOT_CONFIG)
+        # Assign a new dict so traitlets synchronizes configuration to the browser.
+        self.chart._config = {**self.chart._config, **PLOT_CONFIG}
         self.controls.layout.max_height = f"{figure.layout.height}px"
         self.controls.layout.overflow = "hidden"
         self._trace_keys = trace_keys

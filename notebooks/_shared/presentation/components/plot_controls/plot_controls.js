@@ -77,6 +77,14 @@ export default {
     model.on("change:selected", update);
     update();
     let chart = null;
+    const onChartWheel = event => {
+      // Plotly handles zoom on its inner drag layer first. Keep the same
+      // wheel event from scrolling the notebook when it bubbles out.
+      if (event.target.closest?.(".js-plotly-plot")) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    };
     let lastWidth = 0;
     let frame = 0;
     const measure = () => {
@@ -85,8 +93,12 @@ export default {
         const current = el.closest(".pr-comparison")?.firstElementChild;
         if (!current) return;
         if (current !== chart) {
-          if (chart) observer.unobserve(chart);
+          if (chart) {
+            observer.unobserve(chart);
+            chart.removeEventListener("wheel", onChartWheel);
+          }
           chart = current;
+          chart.addEventListener("wheel", onChartWheel, { passive: false });
           observer.observe(chart);
         }
         const width = chart.clientWidth;
@@ -101,6 +113,7 @@ export default {
     measure();
     return () => {
       observer.disconnect();
+      if (chart) chart.removeEventListener("wheel", onChartWheel);
       cancelAnimationFrame(frame);
       model.off("change:selected", update);
       el.replaceChildren();

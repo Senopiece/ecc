@@ -25,56 +25,7 @@ function render({ model, el }) {
   el.addEventListener('click', onClick);
   el.ownerDocument.addEventListener('keydown', onKeyboard, true);
   el.classList.add("pr2-host");
-  el.innerHTML = `
-    <section class="pr2-card">
-      <div class="pr2-title-row">
-        <div><span class="pr2-muted">P:</span> <code class="pr2-polynomial"></code>
-          <span class="pr2-chip">K=<span class="pr2-k"></span></span></div>
-        <div class="pr2-parameters">
-          <label>N <input class="pr2-n" type="number" min="1" step="1"></label>
-          <label>T <input class="pr2-t" type="number" min="0" step="1"></label>
-        </div>
-      </div>
-      <div class="pr2-section">
-        <div class="pr2-section-head"><span>x · information bits</span>
-          <button class="pr2-random" type="button">↻ New random x</button></div>
-        <div class="pr2-grid pr2-x" aria-label="information bits"></div>
-      </div>
-      <div class="pr2-section">
-        <div class="pr2-section-head"><span>y = xG · channel LLR</span></div>
-        <div class="pr2-codeword-scroll" tabindex="0" aria-label="Encoded bits and channel LLRs">
-          <div class="pr2-codeword-content">
-            <div class="pr2-grid pr2-y" aria-label="encoded bits"></div>
-            <div class="pr2-encoding-arrow" aria-hidden="true">↓</div>
-            <div class="pr2-grid pr2-channel" aria-label="channel LLRs"></div>
-          </div>
-        </div>
-      </div>
-      <div class="pr2-section pr2-editor-section">
-        <div class="pr2-section-head"><span>y′ · editable received LLR</span>
-          <span class="pr2-status" role="status"></span></div>
-        <div class="pr2-toolbar">
-          <div class="pr2-segmented" role="radiogroup" aria-label="Editing mode">
-            <button role="radio" data-mode="flip" type="button">Flip</button>
-            <button role="radio" data-mode="suppress" type="button">Suppress</button>
-            <button role="radio" data-mode="restore" type="button">Restore</button>
-          </div>
-          <label class="pr2-flip-param">flip rate <input class="pr2-flip-rate" type="number" min="0" step="0.1" value="0.2"> LLR/tick</label>
-          <label class="pr2-suppress-param" hidden>attenuation <input class="pr2-suppress-db" type="number" min="0" step="1" value="3"> dB/tick</label>
-          <button class="pr2-erase pr2-erase-param" type="button" aria-pressed="false" aria-label="Infinite attenuation (erase)" title="Erase immediately; disable finite attenuation" hidden>∞ dB</button>
-          <label class="pr2-restore-param" hidden>restore rate <input class="pr2-restore-rate" type="number" min="0" step="0.1" value="0.2"> LLR/tick</label>
-        </div>
-        <div class="pr2-grid pr2-yprime" aria-label="editable received LLRs"></div>
-        <div class="pr2-global-row">
-          <span class="pr2-muted pr2-drag-hint" title="Drag across cells; holding applies the brush repeatedly."><span class="pr2-hint-text">Drag across cells; holding applies the brush repeatedly.</span></span>
-          <label>global σ <input class="pr2-global-sigma" type="number" min="0" step="0.1" value="0.5"> LLR</label>
-          <button class="pr2-global" type="button">Apply noise to all y′</button>
-        </div>
-        <div class="pr2-reset-row">
-          <button class="pr2-reset" type="button">Reset y′ = y</button>
-        </div>
-      </div>
-    </section>`;
+  el.innerHTML = model.get("template");
 
   const q = selector => el.querySelector(selector);
   el.querySelectorAll('.pr2-grid').forEach(grid => {

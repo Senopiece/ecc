@@ -6,13 +6,14 @@ import anywidget
 import numpy as np
 import traitlets as tl
 
-from .lfsr import DEFAULT_TERMS, encode, integer_parameter, max_availability, polynomial_terms
+from ..core.lfsr import DEFAULT_TERMS, encode, integer_parameter, polynomial_terms
 
 
 class LLREditor(anywidget.AnyWidget):
-    _esm = Path(__file__).with_name("editor.js")
-    _css = Path(__file__).with_name("editor.css")
+    _esm = Path(__file__).parent / "components" / "editor" / "editor.js"
+    _css = Path(__file__).parent / "components" / "editor" / "editor.css"
     state = tl.Dict().tag(sync=True)
+    template = tl.Unicode().tag(sync=True)
 
     def __init__(self, n=16, iterations=20, terms=DEFAULT_TERMS, seed=None):
         terms = polynomial_terms(terms)
@@ -20,10 +21,11 @@ class LLREditor(anywidget.AnyWidget):
         iterations = integer_parameter(iterations, "T")
         # Anywidget's class-level file objects can retain the imported contents.
         # Read assets for each new editor so rerunning the cell picks up edits.
-        assets = Path(__file__).parent
+        assets = Path(__file__).parent / "components" / "editor"
         super().__init__(
             _esm=(assets / "editor.js").read_text(encoding="utf-8"),
             _css=(assets / "editor.css").read_text(encoding="utf-8"),
+            template=(assets / "editor.html").read_text(encoding="utf-8"),
         )
         self.layout.width = "100%"
         self.layout.margin = "0"
@@ -38,7 +40,6 @@ class LLREditor(anywidget.AnyWidget):
         )
         self.x = self.rng.integers(0, 2, terms[-1], dtype=np.uint8)
         self._colors = []
-        self.availability = max_availability(n, terms)
         self._encode()
         self.on_msg(self._message)
 
@@ -49,7 +50,6 @@ class LLREditor(anywidget.AnyWidget):
         self._code_state = dict(
             polynomial=self.polynomial,
             n=self.n,
-            availability=self.availability,
             x=self.x.tolist(),
             y=self.y.tolist(),
             channel_llr=self.truth_llr.tolist(),
@@ -77,7 +77,7 @@ class LLREditor(anywidget.AnyWidget):
         )
 
     def snapshot(self):
-        """Inputs for decode(**editor.snapshot()); taking a snapshot runs no decoder."""
+        """Copy the experiment state; pass truth only to analysis, never to decoders."""
         return dict(
             initial=self.y_prime.copy(),
             truth=self.y.copy(),
@@ -101,7 +101,6 @@ class LLREditor(anywidget.AnyWidget):
             changed = n != self.n
             self.n, self.iterations = n, t
             if changed:
-                self.availability = max_availability(n, self.terms)
                 self._encode()
                 return
         elif action in ("random", "flip_x"):

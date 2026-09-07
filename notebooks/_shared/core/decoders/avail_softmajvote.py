@@ -1,23 +1,23 @@
-"""Explicit, snapshot-based synchronous additive soft-XOR decoding."""
-
-from dataclasses import dataclass
+"""avail-softmajvote: synchronous addition of check-to-bit soft opinions."""
 
 import numpy as np
 from numba import njit
 
-from .lfsr import DEFAULT_TERMS, integer_parameter, polynomial_terms
+from ..lfsr import DEFAULT_TERMS, integer_parameter, polynomial_terms
+from ._adt import NormalizedMinSum, SoftXor, SqrtSign, Tanh
 
-SOFTXOR_MODES = ("tanh", "normalized-min-sum", "sqrt-sign")
 
-
-def _softxor_options(softxor, coefficient):
-    if softxor not in SOFTXOR_MODES:
-        raise ValueError(f"softxor must be one of {SOFTXOR_MODES}")
-    mode = SOFTXOR_MODES.index(softxor)
-    alpha = float(coefficient) if mode == 1 else 1.0
-    if not np.isfinite(alpha) or not 0 <= alpha <= 1:
-        raise ValueError("Normalized min-sum coefficient must be between 0 and 1")
-    return mode, alpha
+def _softxor_options(softxor: SoftXor):
+    """Lower the configuration to scalar arguments for the compiled kernel."""
+    match softxor:
+        case Tanh():
+            return 0, 1.0
+        case NormalizedMinSum(coefficient=alpha):
+            return 1, alpha
+        case SqrtSign():
+            return 2, 1.0
+        case _:
+            raise TypeError("softxor must be Tanh(), NormalizedMinSum(...), or SqrtSign()")
 
 
 @njit(cache=True, inline="always")
@@ -108,7 +108,13 @@ def _iterate(initial, terms, iterations, mode, alpha):
     return history
 
 
-def iterate(initial, terms=DEFAULT_TERMS, iterations=20, *, softxor="tanh", coefficient=0.8):
+def decode(
+    initial,
+    terms=DEFAULT_TERMS,
+    iterations=20,
+    *,
+    softxor: SoftXor = Tanh(),
+) -> np.ndarray:
     """Return all T+1 states; checks are implicit shifts of sparse exponents.
 
     All modes take O(T*(N + max(0,N-K)*w)) time. Storage O((T+1)*N + w).
@@ -116,7 +122,7 @@ def iterate(initial, terms=DEFAULT_TERMS, iterations=20, *, softxor="tanh", coef
     """
     terms = polynomial_terms(terms)
     iterations = integer_parameter(iterations, "T")
-    mode, alpha = _softxor_options(softxor, coefficient)
+    mode, alpha = _softxor_options(softxor)
     initial = np.asarray(initial, dtype=np.float64)
     if initial.ndim != 1 or not initial.size or not np.all(np.isfinite(initial)):
         raise ValueError("Initial LLRs must be a nonempty finite vector")
@@ -126,85 +132,4 @@ def iterate(initial, terms=DEFAULT_TERMS, iterations=20, *, softxor="tanh", coef
         iterations,
         mode,
         alpha,
-    )
-
-
-@njit(cache=True)
-def _metrics(history, truth, terms):
-    steps, n = history.shape
-    count = max(0, n - terms[-1])
-    scores = np.empty((5, steps), dtype=np.float64)
-    for t in range(steps):
-        errors = erasures = loss = signed_sum = 0.0
-        for i in range(n):
-            margin = history[t, i] if truth[i] == 0 else -history[t, i]
-            if margin < 0:
-                errors += 1
-            elif margin == 0:
-                errors += 0.5
-                erasures += 1
-            loss += (max(0.0, -margin) + np.log1p(np.exp(-abs(margin)))) / n
-            signed_sum += margin / n
-        violated = 0
-        for start in range(count):
-            parity = False
-            for p in terms:
-                parity ^= history[t, start + p] < 0
-            violated += parity
-        scores[0, t] = errors / n
-        scores[1, t] = erasures / n
-        scores[2, t] = violated / count if count else np.nan
-        scores[3, t] = loss
-        scores[4, t] = signed_sum
-    return scores
-
-
-@dataclass(frozen=True)
-class DecodeResult:
-    """One completed run, detached from any subsequent edits in the widget."""
-
-    history: np.ndarray
-    truth: np.ndarray
-    terms: tuple[int, ...]
-    scores: dict[str, np.ndarray]
-    softxor: str
-    coefficient: float | None
-
-
-def decode(
-    initial,
-    truth,
-    terms=DEFAULT_TERMS,
-    iterations=20,
-    *,
-    softxor="tanh",
-    coefficient=0.8,
-):
-    """Explicit entry point: decode a snapshot and compute diagnostics once."""
-    terms = polynomial_terms(terms)
-    initial = np.array(initial, dtype=np.float64, copy=True)
-    truth = np.asarray(truth)
-    if truth.shape != initial.shape or not np.all((truth == 0) | (truth == 1)):
-        raise ValueError("Truth must be a binary vector matching the observation")
-    truth = np.array(truth, dtype=np.uint8, copy=True)
-    mode, alpha = _softxor_options(softxor, coefficient)
-    history = iterate(initial, terms, iterations, softxor=softxor, coefficient=alpha)
-    values = _metrics(history, truth, np.asarray(terms, dtype=np.int64))
-    names = (
-        "Sign error rate (ties = 1/2)",
-        "Erasure fraction",
-        "Unsatisfied checks",
-        "Mean logistic loss",
-        "Mean signed margin",
-    )
-    history.flags.writeable = False
-    truth.flags.writeable = False
-    values.flags.writeable = False
-    return DecodeResult(
-        history,
-        truth,
-        terms,
-        dict(zip(names, values, strict=True)),
-        softxor,
-        alpha if mode == 1 else None,
     )

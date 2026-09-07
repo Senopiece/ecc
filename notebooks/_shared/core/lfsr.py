@@ -59,18 +59,3 @@ def encode(bits, n=16, terms=DEFAULT_TERMS):
         np.asarray(terms[:-1], dtype=np.int64),
         terms[-1],
     )
-
-
-def max_availability(n, terms=DEFAULT_TERMS):
-    """Maximum overlap of check-membership intervals; O(w log w), no N-array."""
-    terms = polynomial_terms(terms)
-    count = max(0, n - terms[-1])
-    events = {}
-    for p in terms:
-        events[p] = events.get(p, 0) + 1
-        events[p + count] = events.get(p + count, 0) - 1
-    active = maximum = 0
-    for p in sorted(events):
-        active += events[p]
-        maximum = max(maximum, active)
-    return maximum

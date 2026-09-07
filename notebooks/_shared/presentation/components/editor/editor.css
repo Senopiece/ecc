@@ -1,17 +1,17 @@
-.pr2-host { display: block; box-sizing: border-box; width: 100%; min-width: 0; max-width: 100%; margin: 0 !important; padding: 0 !important; border: 0 !important; background: var(--vscode-editor-background, #1e1e1e); color: var(--vscode-foreground, #cccccc); font: 13px/1.4 var(--vscode-font-family, system-ui); }
+.pr2-host { display: block; box-sizing: border-box; width: 100%; min-width: 0; max-width: 100%; margin: 0 !important; padding: 0 !important; border: 0 !important; background: var(--vscode-editor-background, #1f1f1f); color: var(--vscode-foreground, #cccccc); font: 13px/1.4 var(--vscode-font-family, system-ui); }
 /* VS Code/Jupyter may paint the output wrapper white, outside AnyWidget's el.
    Restrict this reset to wrappers containing this editor, not other outputs. */
 :where(.output, .output_container, .output_subarea, .widget-subarea,
        .jp-OutputArea-output, .jupyter-widgets, div:has(> .pr2-host)):has(.pr2-host) {
-  --jp-layout-color0: var(--vscode-editor-background, #1e1e1e);
-  --jp-layout-color1: var(--vscode-editor-background, #1e1e1e);
-  background: var(--vscode-editor-background, #1e1e1e) !important;
+  --jp-layout-color0: var(--vscode-editor-background, #1f1f1f);
+  --jp-layout-color1: var(--vscode-editor-background, #1f1f1f);
+  background: var(--vscode-editor-background, #1f1f1f) !important;
   border: 0 !important;
   padding: 0 !important;
   border-radius: 0 !important;
   box-shadow: none !important;
 }
-.pr2-host .pr2-card { border: 0 !important; border-radius: 0; box-shadow: none !important; background: var(--vscode-editor-background, #1e1e1e); overflow: hidden; width: 100%; }
+.pr2-host .pr2-card { border: 0 !important; border-radius: 0; box-shadow: none !important; background: var(--vscode-editor-background, #1f1f1f); overflow: hidden; width: 100%; }
 .pr2-host .pr2-title-row, .pr2-host .pr2-section-head, .pr2-host .pr2-toolbar, .pr2-host .pr2-global-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .pr2-host .pr2-title-row { justify-content: space-between; padding: 12px 14px; border-top: 0 !important; box-shadow: none !important; background: var(--vscode-sideBar-background, #252526); font-size: 14px; }
 .pr2-host .pr2-title-row code { color: var(--vscode-symbolIcon-functionForeground, #dcdcaa); font-size: 14px; }

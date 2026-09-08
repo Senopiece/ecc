@@ -23,7 +23,16 @@ def run_decoders(decoders, initial, terms=DEFAULT_TERMS, iterations=20):
     for name, decoder in decoders.items():
         if not isinstance(name, str) or not name.strip() or not callable(decoder):
             raise ValueError("Each decoder entry needs a name and a callable")
-        history = decoder(initial.copy(), terms=terms, iterations=iterations)
+        batch_history = decoder(
+            initial[None, :].copy(), terms=terms, iterations=iterations, return_history=True
+        )
+        if not isinstance(batch_history, np.ndarray) or batch_history.shape != (
+            1,
+            iterations + 1,
+            initial.size,
+        ):
+            raise ValueError(f"{name}: decode must return a (1, T+1, N) history")
+        history = batch_history[0]
         if not isinstance(history, np.ndarray) or history.shape != (iterations + 1, initial.size):
             raise ValueError(f"{name}: decode must return a (T+1, N) ndarray")
         if not np.all(np.isfinite(history)) or not np.array_equal(history[0], initial):

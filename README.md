@@ -14,7 +14,7 @@ uv run jupyter lab
 
 ## Интерактивная лаборатория Primitive Rateless
 
-Откройте `notebooks/pr_ecc.ipynb` в ядре проекта:
+Откройте `notebooks/individual_inspection.ipynb` в ядре проекта:
 
 1. Выполните настройку и ячейку редактора. Меняйте x, N, T и редактируйте y′.
 2. Выберите конфигурации в словаре `DECODERS` и запустите **Decode the current observation**.
@@ -31,8 +31,25 @@ uv run jupyter lab
 Начальное сравнение: `avail-softmajvote(tanh)`,
 `avail-softmajvote(sqrt-sign)` и `avail-softmajvote(min-sum(0.8))`.
 Параметры фиксируются через `functools.partial`. Для новой архитектуры достаточно
-реализовать `decode(initial, terms=DEFAULT_TERMS, iterations=20, ...) -> np.ndarray`
+реализовать `decode(initial_batch, terms=DEFAULT_TERMS, iterations=20, return_history=False, ...)`
 в `notebooks/_shared/core/decoders` и добавить функцию в `DECODERS`.
+
+Декодеры принимают батч `(B, N)` и возвращают финальные LLR `(B, N)`.
+При `return_history=True` результат имеет форму `(B, T+1, N)`.
+Индивидуальный ноутбук оборачивает наблюдение в батч размера 1.
+
+## Сравнение на случайных шумовых входах
+
+`notebooks/marginal_comparison.ipynb`: K=16, N=32, 1024 батча по 128 примеров.
+Для каждого примера независимо выбираются x и SNR из `(-3, 3)` дБ.
+SNR определяется как Es/N0 при Es=1: `sigma² = 1 / (2 * 10**(SNR_dB/10))`,
+а вход декодера — `2 * received / sigma²`.
+
+Joblib запускает по задаче на батч, tqdm показывает завершённые батчи.
+Все методы получают одинаковые наблюдения. Numba прогревается до замеров.
+Анализ показывает нс/пример и условные распределения SER по SNR:
+среднее и двумерную гистограмму SER, нормализованную по каждому столбцу SNR.
+Истории в этом эксперименте не выделяются.
 
 Декодеры не получают истинное слово, не вычисляют метрики и не строят графики.
 `_shared.application.metrics.metrics(history, true, terms=...)` возвращает численные метрики.

@@ -4,9 +4,14 @@
 core/
   lfsr.py                     Sparse binary encoding
   channel.py                  BPSK/AWGN batches with per-sample Es/N0
+  generator.py                Sparse LFSR generator-column supports
   decoders/
     _adt.py                   Soft-XOR configuration variants
-    avail_softmajvote.py       Compiled batch decoding; optional histories
+    _softxor.py               Shared soft-XOR dispatch and box-plus
+    y/
+      avail_softmajvote.py     Compiled codeword decoding; optional histories
+    x/
+      avail_softmajvote.py Recover x from fixed y LLRs via generator columns
 application/
   comparison.py               Run decoders on independent observation copies
   metrics.py                  Diagnostics computed from histories and truth

@@ -19,7 +19,7 @@ def validate_inputs(history, true):
 @njit(cache=True)
 def _metrics(history, truth, terms):
     steps, n = history.shape
-    count = max(0, n - terms[-1])
+    count = max(0, n - terms[-1]) if len(terms) else 0
     scores = np.empty((5, steps), dtype=np.float64)
     for t in range(steps):
         errors = erasures = loss = signed_sum = 0.0
@@ -47,10 +47,11 @@ def _metrics(history, truth, terms):
 
 
 def metrics(history, true, terms=DEFAULT_TERMS):
-    """Five diagnostic curves. Terms are needed only for the parity-check metric."""
+    """Diagnostics; terms=None omits recurrence syndrome, e.g. for x histories."""
     history, true = validate_inputs(history, true)
-    terms = polynomial_terms(terms)
-    values = _metrics(history, true, np.asarray(terms, dtype=np.int64))
+    include_syndrome = terms is not None
+    exponents = polynomial_terms(terms) if include_syndrome else ()
+    values = _metrics(history, true, np.asarray(exponents, dtype=np.int64))
     names = (
         "Sign error rate (ties = 1/2)",
         "Erasure fraction",
@@ -58,4 +59,8 @@ def metrics(history, true, terms=DEFAULT_TERMS):
         "Mean logistic loss",
         "Mean signed margin",
     )
-    return dict(zip(names, values, strict=True))
+    return {
+        name: value
+        for i, (name, value) in enumerate(zip(names, values, strict=True))
+        if include_syndrome or i != 2
+    }

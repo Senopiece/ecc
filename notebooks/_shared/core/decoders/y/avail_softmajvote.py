@@ -3,35 +3,9 @@
 import numpy as np
 from numba import njit
 
-from ..lfsr import DEFAULT_TERMS, integer_parameter, polynomial_terms
-from ._adt import NormalizedMinSum, SoftXor, SqrtSign, Tanh
-
-
-def _softxor_options(softxor: SoftXor):
-    """Lower the configuration to scalar arguments for the compiled kernel."""
-    match softxor:
-        case Tanh():
-            return 0, 1.0
-        case NormalizedMinSum(coefficient=alpha):
-            return 1, alpha
-        case SqrtSign():
-            return 2, 1.0
-        case _:
-            raise TypeError("softxor must be Tanh(), NormalizedMinSum(...), or SqrtSign()")
-
-
-@njit(cache=True, inline="always")
-def _box_plus(a, b):
-    # +infinity is the identity for the empty prefix/suffix of an XOR.
-    if a == np.inf:
-        return b
-    if b == np.inf:
-        return a
-    if a == 0.0 or b == 0.0:
-        return 0.0
-    magnitude = min(abs(a), abs(b))
-    sign = 1.0 if (a > 0) == (b > 0) else -1.0
-    return sign * magnitude + np.log1p(np.exp(-abs(a + b))) - np.log1p(np.exp(-abs(a - b)))
+from ...lfsr import DEFAULT_TERMS, integer_parameter, polynomial_terms
+from .._adt import SoftXor, Tanh
+from .._softxor import _box_plus, _softxor_options
 
 
 @njit(cache=True)

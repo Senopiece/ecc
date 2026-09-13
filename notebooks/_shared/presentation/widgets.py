@@ -81,6 +81,7 @@ class LLREditor(anywidget.AnyWidget):
         return dict(
             initial=self.y_prime.copy(),
             truth=self.y.copy(),
+            information=self.x.copy(),
             terms=self.terms,
             iterations=self.iterations,
         )

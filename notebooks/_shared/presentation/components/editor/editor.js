@@ -108,6 +108,26 @@ function render({ model, el }) {
     for (const name of ['flip', 'suppress', 'restore']) q(`.pr2-${name}-param`).hidden = mode !== name;
     q('.pr2-erase-param').hidden = mode !== 'suppress';
   }
+  function drawGenerator() {
+    const g = model.get('generator');
+    if (!g?.columns) return;
+    const fragment = document.createDocumentFragment();
+    g.columns.forEach((support, column) => {
+      const values = new Set(support);
+      const node = document.createElement('div');
+      node.className = 'pr2-generator-column';
+      for (let row = 0; row < g.rows; row++) {
+        const bit = document.createElement('span');
+        const one = values.has(row);
+        bit.textContent = one ? '1' : '0';
+        bit.className = one ? 'pr2-generator-one' : 'pr2-generator-zero';
+        bit.title = `G[${row}, ${column}] = ${one ? 1 : 0}`;
+        node.append(bit);
+      }
+      fragment.append(node);
+    });
+    q('.pr2-generator').replaceChildren(fragment);
+  }
   function update() {
     const s = model.get('state');
     const polynomial = q('.pr2-polynomial');
@@ -184,6 +204,8 @@ function render({ model, el }) {
   document.addEventListener('visibilitychange', stop);
   window.addEventListener('blur', stop);
   model.on('change:state', update);
+  model.on('change:generator', drawGenerator);
+  drawGenerator();
   update(); drawMode();
   const hint = q('.pr2-drag-hint');
   const hintText = q('.pr2-hint-text');
@@ -203,6 +225,7 @@ function render({ model, el }) {
     el.ownerDocument.removeEventListener('keydown', onKeyboard, true);
     hintObserver.disconnect();
     stop(); model.off('change:state', update);
+    model.off('change:generator', drawGenerator);
     document.removeEventListener('pointermove', pointerMove);
     document.removeEventListener('pointerup', stop);
     document.removeEventListener('pointercancel', stop);

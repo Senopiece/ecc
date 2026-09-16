@@ -6,6 +6,7 @@ import anywidget
 import numpy as np
 import traitlets as tl
 
+from ..core.generator import column_supports
 from ..core.lfsr import DEFAULT_TERMS, encode, integer_parameter, polynomial_terms
 
 
@@ -14,6 +15,7 @@ class LLREditor(anywidget.AnyWidget):
     _css = Path(__file__).parent / "components" / "editor" / "editor.css"
     state = tl.Dict().tag(sync=True)
     template = tl.Unicode().tag(sync=True)
+    generator = tl.Dict().tag(sync=True)
 
     def __init__(self, n=16, iterations=20, terms=DEFAULT_TERMS, seed=None):
         terms = polynomial_terms(terms)
@@ -44,6 +46,13 @@ class LLREditor(anywidget.AnyWidget):
         self.on_msg(self._message)
 
     def _encode(self):
+        if getattr(self, "_generator_n", None) != self.n:
+            offsets, indices = column_supports(self.n, self.terms)
+            self.generator = dict(
+                rows=self.terms[-1],
+                columns=[indices[offsets[j] : offsets[j + 1]].tolist() for j in range(self.n)],
+            )
+            self._generator_n = self.n
         self.y = encode(self.x, self.n, self.terms)
         self.truth_llr = 1.0 - 2.0 * self.y
         self.y_prime = self.truth_llr.copy()

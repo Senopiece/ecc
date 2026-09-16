@@ -26,9 +26,18 @@
 .pr2-host .pr2-x-cell { color: var(--vscode-button-foreground, white); background: var(--vscode-button-background, #0e639c); }
 .pr2-host .pr2-y-cell, .pr2-host .pr2-channel-cell { color: var(--vscode-foreground, #ddd); background: var(--vscode-input-background, #313131); cursor: default; }
 .pr2-host .pr2-codeword-scroll { max-width: 100%; overflow-x: auto; scrollbar-width: thin; scrollbar-color: var(--vscode-scrollbarSlider-background, #555) transparent; }
-.pr2-host .pr2-codeword-content { width: max-content; }
+.pr2-host .pr2-codeword-content { width: max-content; display: grid; grid-template-columns: 36px auto; column-gap: 8px; align-items: center; padding: 6px; }
+.pr2-host .pr2-equation-label { color: var(--vscode-descriptionForeground, #999); font: 13px var(--vscode-editor-font-family, monospace); text-align: right; }
+.pr2-host .pr2-generator { display: flex; position: relative; padding: 5px 0; margin-bottom: 10px; }
+.pr2-host .pr2-generator::before, .pr2-host .pr2-generator::after { content: ''; position: absolute; top: 0; bottom: 0; width: 5px; border-top: 1px solid #777; border-bottom: 1px solid #777; pointer-events: none; }
+.pr2-host .pr2-generator::before { left: 0; border-left: 1px solid #777; }
+.pr2-host .pr2-generator::after { right: 0; border-right: 1px solid #777; }
+.pr2-host .pr2-generator-column { flex: 0 0 48px; width: 48px; text-align: center; font: 12px/18px var(--vscode-editor-font-family, monospace); }
+.pr2-host .pr2-generator-column span { display: block; }
+.pr2-host .pr2-generator-one { color: #9cdcfe; }
+.pr2-host .pr2-generator-zero { color: #777; }
 .pr2-host .pr2-codeword-content .pr2-grid { overflow: visible; max-width: none; }
-.pr2-host .pr2-encoding-arrow { text-align: center; padding: 4px 0; color: var(--vscode-descriptionForeground, #999); font-size: 20px; line-height: 1; }
+.pr2-host .pr2-encoding-arrow { grid-column: 2; text-align: center; padding: 4px 0; color: var(--vscode-descriptionForeground, #999); font-size: 20px; line-height: 1; }
 .pr2-host .pr2-codeword-scroll:focus-visible { outline: 2px solid #75beff !important; outline-offset: -2px; }
 .pr2-host.pr2-pointer-focus .pr2-codeword-scroll:focus { outline: none !important; }
 .pr2-host .pr2-yprime-cell { touch-action: none; transition: background 70ms linear; }

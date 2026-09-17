@@ -74,3 +74,11 @@
 .pr-plot-controls button[aria-pressed="true"] { opacity: 1; }
 .pr-plot-controls button:focus { outline: none; }
 .pr-plot-controls button:focus-visible { outline: 2px solid #75beff; outline-offset: 2px; }
+.pr-plot-controls input[type="range"] {
+  width: calc(100% - 12px);
+  margin: 8px 6px;
+  accent-color: #75beff;
+  cursor: pointer;
+}
+.pr-plot-controls input[type="range"]:disabled { opacity: 0.3; cursor: default; }
+.pr-plot-controls output { color: #aaa; font-variant-numeric: tabular-nums; }

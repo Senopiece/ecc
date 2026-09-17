@@ -7,6 +7,7 @@ export default {
     style.textContent = model.get("stylesheet");
     el.append(style);
     const buttons = [];
+    const sliders = [];
     const select = (group, values) => {
       model.set("selected", { ...model.get("selected"), [group.id]: values });
       model.save_changes();
@@ -20,6 +21,32 @@ export default {
       const label = document.createElement("strong");
       label.textContent = group.label;
       heading.append(label);
+      if (group.kind === "slider") {
+        const all = document.createElement("button");
+        all.type = "button";
+        all.textContent = "ALL";
+        all.setAttribute("aria-label", `All ${group.label}`);
+        const slider = document.createElement("input");
+        slider.type = "range";
+        slider.min = "0";
+        slider.max = String(group.options.length - 1);
+        slider.step = "1";
+        slider.value = "0";
+        slider.setAttribute("aria-label", group.label);
+        const value = document.createElement("output");
+        let last = group.options[0];
+        slider.oninput = () => {
+          last = group.options[Number(slider.value)];
+          select(group, [last]);
+        };
+        all.onclick = () => select(group,
+          (model.get("selected")[group.id] || []).includes("ALL") ? [last] : ["ALL"]);
+        heading.append(all, value);
+        section.append(heading, slider);
+        el.append(section);
+        sliders.push({ group, slider, all, value, remember: x => { last = x; } });
+        continue;
+      }
       if (group.multiple) {
         for (const [title, values] of [["All", group.options], ["None", []]]) {
           const action = document.createElement("button");
@@ -58,7 +85,9 @@ export default {
         button.append(text);
         button.onclick = () => {
           const current = model.get("selected")[group.id] || [];
-          select(group, group.multiple
+          select(group, group.kind === "toggle"
+            ? (current.includes(option) ? [] : [option])
+            : group.multiple
             ? (current.includes(option) ? current.filter(x => x !== option) : [...current, option])
             : [option]);
         };
@@ -72,6 +101,18 @@ export default {
       const selected = model.get("selected");
       for (const { button, group, option } of buttons) {
         button.setAttribute("aria-pressed", String((selected[group] || []).includes(option)));
+      }
+      for (const { group, slider, all, value, remember } of sliders) {
+        const current = selected[group.id]?.[0] || group.options[0];
+        const aggregate = current === "ALL";
+        slider.disabled = aggregate;
+        all.setAttribute("aria-pressed", String(aggregate));
+        value.textContent = aggregate ? (group.all_label || "All sizes") : current;
+        if (!aggregate) {
+          slider.value = String(group.options.indexOf(current));
+          slider.setAttribute("aria-valuetext", current);
+          remember(current);
+        }
       }
     };
     model.on("change:selected", update);

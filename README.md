@@ -78,3 +78,13 @@ K вычисляется из P. Примитивность принимаетс
 `numba.njit(cache=True)`; первый вызов может включать компиляцию. История каждого
 декодера занимает `8 * (T + 1) * N` байт, не считая графиков и их копий данных. Документация
 внутри ноутбука — на английском.
+
+## Unknown-prefix invariant PR experiment
+
+[notebooks/x_ecc/shift_invariant_pr.ipynb](notebooks/x_ecc/shift_invariant_pr.ipynb)
+compares message recovery under AWGN and an unknown removed prefix. The default
+configuration uses C=32, optimized component degrees, zero padding, a phase block,
+and low-order OSD. A million-trial run is configured; its results stay in notebook memory.
+
+- [Construction, interfaces and experiment parameters](docs/shift_invariant_pr.md)
+- [Theoretical time and memory analysis](docs/shift_invariant_pr_methods.md)
